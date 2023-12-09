@@ -1,24 +1,10 @@
 import { Router } from "express";
-import User from "../models/user.js";
+import { addUser, getAllUsers, getUserById } from "../controllers/user.js";
 
 const UserRouter = Router();
 
-
-UserRouter.get("/", (req, res) => {
-  res.send("Hello Users!");
-});
-
-UserRouter.post("/", (req, res, next) => {
-  const user = req.body;
-
-  const userModel = new User(user);
-
-  userModel.save()
-    .then((data) => {
-      res.json(data);
-    })
-    .catch(next);
-    
-})
+UserRouter.get("/",getAllUsers);
+UserRouter.post("/", addUser);
+UserRouter.get("/:id", getUserById);
 
 export default UserRouter;
