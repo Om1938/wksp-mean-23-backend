@@ -12,6 +12,8 @@ configDotenv({
 const app = express();
 connectDB();
 
+app.use(express.json());
+
 const port = process.env.PORT;
 
 // Routes
