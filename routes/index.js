@@ -7,7 +7,4 @@ const IndexRouter = Router();
 IndexRouter.use("/users",UserRouter);
 IndexRouter.use("/posts",PostRouter)
 
-
-
-
 export default IndexRouter;
