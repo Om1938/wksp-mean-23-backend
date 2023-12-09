@@ -1,40 +1,23 @@
 import express from "express";
 import {configDotenv} from 'dotenv'
+import IndexRouter from "./routes/index.js";
+import connectDB from "./config/db.js";
 
+// Load env variables
 configDotenv({
     path:'.env'
 });
 
-const port = process.env.PORT;
+// Create express app
 const app = express();
+connectDB();
 
-app.get("/", (req, res) => {
-  res.send("Hello World!");
-});
+const port = process.env.PORT;
 
-app.get("/ping/:name", (req, res) => {
-  console.log(req.params.name);
-  res.send(`pong ${req.params.name}`);
-});
+// Routes
+app.use(IndexRouter);
 
-app.post('/post',(req,res)=>{
-    res.send('post')
-})
-
+// Start server
 app.listen(port, "0.0.0.0", () => {
   console.log(`Server is listening on port ${port}`);
 });
-
-/* HTTP Requests
-    * GET
-    * POST
-    * PUT
-    * DELETE
-    * PATCH
-    * OPTIONS
-    
-
-
-*/
-
-
