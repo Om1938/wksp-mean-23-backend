@@ -2,7 +2,7 @@ import Post from "../models/post.js";
 import Comment from "../models/comment.js";
 
 export const getPostsService = async () => {
-  return Post.find({});
+  return Post.find({}).populate("author");
 };
 
 export const addPostService = async (post) => {
@@ -11,29 +11,42 @@ export const addPostService = async (post) => {
 };
 
 export const getPostByIdService = async (id) => {
-  return Post.findById(id);
+  const post = await Post.findById(id).populate("author");
+
+  if (!post) {
+    throw new Error("Post not found");
+  }
+
+  return post;
 };
 
-export const updatePostService = async (id, post) => {
-  return Post.findByIdAndUpdate(id, post, {
-    new: false,
-  });
+export const updatePostService = async (id, author, post) => {
+  const selectedPost = await getPostByIdService(id);
+  if (!selectedPost) {
+    throw new Error("Post not found");
+  }
+
+  if (!selectedPost.author._id.equals(author)) {
+    throw new Error("Forbidden: Not your post");
+  }
+
+  return Post.findByIdAndUpdate(id, post);
 };
 
 export const deletePostService = async (id) => {
-  return Post.findByIdAndDelete(id);
+  const deltetdPost = await Post.findByIdAndDelete(id);
+  if (!deltetdPost) {
+    throw new Error("Post not found");
+  }
+
+  return deltetdPost;
 };
 
-export const addCommentToPostService = async (post,author, content) => {
-const commentModel = new Comment({author,content, post});
-return commentModel.save();
-}
+export const addCommentToPostService = async (post, author, content) => {
+  const commentModel = new Comment({ author, content, post });
+  return commentModel.save();
+};
 
-export const getCommentsByPostIdService = async (id) => {
-  return Comment.find({post:id});
-}
-
-export const deleteCommentService = async (id) => {
-  return Comment.findByIdAndDelete(id);
-}
-
+export const getCommentsByPostIdService = async (postId) => {
+  return Comment.find({ post: postId });
+};
