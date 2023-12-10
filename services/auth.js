@@ -14,7 +14,7 @@ export const loginAuthService = async (email, password) => {
   // Attempts to find a user by their email. Only retrieves necessary fields.
   const user = await User.findOne(
     { email },
-    { password: 1, email: 1, username: 1 }
+    { password: 1, email: 1, username: 1 },
   );
 
   // If no user is found, an error is thrown.
