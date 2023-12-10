@@ -6,10 +6,13 @@ import {
   getPostByIdService,
   getPostsService,
   updatePostService,
+  likePostService,
+  unlikePostService,
+  getAggregateLikesService,
 } from "../services/post.js";
 
 export const getAllPosts = async (req, res, next) => {
-  getPostsService()
+  getAggregateLikesService()
     .then((data) => {
       res.json(data);
     })
@@ -87,6 +90,26 @@ export const addCommentToPost = (req, res, next) => {
 export const getCommentsForPost = (req, res, next) => {
   const { postId } = req.params;
   getCommentsByPostIdService(postId)
+    .then((data) => {
+      res.json(data);
+    })
+    .catch(next);
+};
+
+export const likePost = (req, res, next) => {
+  const { postId } = req.params;
+  const { user } = req;
+  likePostService(postId, user._id)
+    .then((data) => {
+      res.json(data);
+    })
+    .catch(next);
+};
+
+export const unlikePost = (req, res, next) => {
+  const { postId } = req.params;
+  const { user } = req;
+  unlikePostService(postId, user._id)
     .then((data) => {
       res.json(data);
     })

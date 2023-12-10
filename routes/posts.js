@@ -5,6 +5,8 @@ import {
   getAllPosts,
   getPostById,
   updatePost,
+  likePost,
+  unlikePost,
 } from "../controllers/post.js";
 
 import { autheticate } from "../middlewares/auth.js";
@@ -148,6 +150,9 @@ PostRouter.put("/:id", autheticate, updatePost);
  *         description: Post deleted successfully.
  */
 PostRouter.delete("/:id", deletePost);
+
+PostRouter.post("/:id/like", autheticate, likePost);
+PostRouter.delete("/:id/like", autheticate, unlikePost);
 
 PostRouter.use("/:postId/comments", PostCommentRouter);
 

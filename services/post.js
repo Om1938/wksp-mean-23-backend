@@ -1,5 +1,6 @@
 import Post from "../models/post.js";
 import Comment from "../models/comment.js";
+import Like from "../models/like.js";
 
 /**
  * Retrieves all posts.
@@ -102,4 +103,89 @@ export const addCommentToPostService = async (postId, authorId, content) => {
  */
 export const getCommentsByPostIdService = async (postId) => {
   return Comment.find({ post: postId });
+};
+
+export const likePostService = async (postId, userId) => {
+  const like = await Like.findOne({ post: postId, user: userId });
+
+  if (like) {
+    throw new Error("Already liked");
+  }
+
+  const likeModel = new Like({ post: postId, user: userId });
+
+  return likeModel.save();
+};
+
+export const unlikePostService = async (postId, userId) => {
+  const like = await Like.findOne({ post: postId, user: userId });
+
+  if (!like) {
+    throw new Error("Not liked");
+  }
+
+  return Like.findByIdAndDelete(like._id);
+};
+
+export const getAggregateLikesService = async (postId) => {
+  const pipeline = [
+    {
+      $lookup: {
+        from: "users",
+        localField: "author",
+        foreignField: "_id",
+        as: "authorDetails",
+      },
+    },
+    {
+      $unwind: "$authorDetails",
+    },
+    {
+      $lookup: {
+        from: "likes",
+        let: { postId: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $eq: ["$post", "$$postId"],
+              },
+            },
+          },
+          {
+            $count: "likeCount",
+          },
+        ],
+        as: "likeData",
+      },
+    },
+    {
+      $lookup: {
+        from: "comments",
+        localField: "_id",
+        foreignField: "post",
+        as: "comments",
+      },
+    },
+    {
+      $addFields: {
+        likeCount: {
+          $ifNull: [{ $arrayElemAt: ["$likeData.likeCount", 0] }, 0],
+        },
+      },
+    },
+    {
+      $project: {
+        title: 1,
+        content: 1,
+        "authorDetails.username": 1,
+        "authorDetails.email": 1,
+        likeCount: 1,
+        comments: 1,
+      },
+    },
+  ];
+
+  // Execute the aggregation pipeline on the Post model
+  return Post.aggregate(pipeline);
 };

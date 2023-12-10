@@ -1,5 +1,6 @@
 import User from "../models/user.js";
 import jwt from "jsonwebtoken";
+import { compare } from "bcrypt";
 
 /**
  * Authenticates a user and provides a JWT token if successful.
@@ -22,7 +23,7 @@ export const loginAuthService = async (email, password) => {
   }
 
   // Compares the provided password with the stored one.
-  const isMatch = password === user.password;
+  const isMatch = compare(password, user.password);
   if (!isMatch) {
     throw new Error("Wrong password");
   }
