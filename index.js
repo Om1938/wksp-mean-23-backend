@@ -18,9 +18,9 @@ configDotenv({
 const app = express();
 app.use(
   cors({
-    origin: "http://localhost:4200",
-    // credentials: true,
-  }),
+    origin: "http://10.1.16.21:4200",
+    credentials: true,
+  })
 );
 connectDB();
 

@@ -7,6 +7,7 @@ import {
   updatePost,
   likePost,
   unlikePost,
+  doILike,
 } from "../controllers/post.js";
 
 import { autheticate } from "../middlewares/auth.js";
@@ -153,6 +154,7 @@ PostRouter.delete("/:id", deletePost);
 
 PostRouter.post("/:id/like", autheticate, likePost);
 PostRouter.delete("/:id/like", autheticate, unlikePost);
+PostRouter.get("/:id/doILike", autheticate, doILike);
 
 PostRouter.use("/:postId/comments", PostCommentRouter);
 

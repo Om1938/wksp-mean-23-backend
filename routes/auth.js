@@ -1,5 +1,6 @@
 import { Router } from "express";
-import { login, logout, register } from "../controllers/auth.js";
+import { login, logout, me, register } from "../controllers/auth.js";
+import autheticate from "../middlewares/auth.js";
 
 const AuthRouter = Router();
 
@@ -84,5 +85,7 @@ AuthRouter.post("/login", login);
  *         description: User logged out successfully
  */
 AuthRouter.post("/logout", logout);
+
+AuthRouter.get("/me", autheticate, me);
 
 export default AuthRouter;

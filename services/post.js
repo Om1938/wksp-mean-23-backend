@@ -74,12 +74,15 @@ export const updatePostService = async (id, author, postUpdate) => {
  * @throws {Error} If no post with the given ID is found.
  */
 export const deletePostService = async (id) => {
-  const deletedPost = await Post.findByIdAndDelete(id);
-  if (!deletedPost) {
+  const selectedPost = await Post.findById(id);
+
+  if (!selectedPost) {
     throw new Error("Post not found");
   }
 
-  return deletedPost;
+  const deletedPost = await Post.deleteOne({ _id: id });
+
+  return selectedPost;
 };
 
 /**
@@ -102,10 +105,11 @@ export const addCommentToPostService = async (postId, authorId, content) => {
  * @returns {Promise<Array>} A promise that resolves to an array of comment objects associated with the post.
  */
 export const getCommentsByPostIdService = async (postId) => {
-  return Comment.find({ post: postId });
+  return Comment.find({ post: postId }).populate("author");
 };
 
 export const likePostService = async (postId, userId) => {
+  console.log(postId, userId);
   const like = await Like.findOne({ post: postId, user: userId });
 
   if (like) {

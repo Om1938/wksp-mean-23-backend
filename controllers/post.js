@@ -1,3 +1,4 @@
+import Like from "../models/like.js";
 import {
   addCommentToPostService,
   addPostService,
@@ -12,7 +13,7 @@ import {
 } from "../services/post.js";
 
 export const getAllPosts = async (req, res, next) => {
-  getAggregateLikesService()
+  getPostsService()
     .then((data) => {
       res.json(data);
     })
@@ -97,21 +98,33 @@ export const getCommentsForPost = (req, res, next) => {
 };
 
 export const likePost = (req, res, next) => {
-  const { postId } = req.params;
+  const { id: postId } = req.params;
   const { user } = req;
   likePostService(postId, user._id)
     .then((data) => {
-      res.json(data);
+      res.json({ doILike: true, data: !!data });
     })
     .catch(next);
 };
 
 export const unlikePost = (req, res, next) => {
-  const { postId } = req.params;
+  const { id: postId } = req.params;
   const { user } = req;
+
+  console.log(postId, user._id);
   unlikePostService(postId, user._id)
     .then((data) => {
-      res.json(data);
+      res.json({ doILike: false, data });
+    })
+    .catch(next);
+};
+
+export const doILike = (req, res, next) => {
+  const { id: postId } = req.params;
+  const { user } = req;
+  Like.findOne({ post: postId, user: user._id })
+    .then((data) => {
+      res.json({ doILike: true, data: !!data });
     })
     .catch(next);
 };
