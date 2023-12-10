@@ -7,6 +7,7 @@ import swaggerUi from "swagger-ui-express";
 import swaggerDocument from "./swaggerConfig.js";
 
 import cookieParser from "cookie-parser";
+import cors from "cors";
 
 // Load env variables
 configDotenv({
@@ -15,6 +16,12 @@ configDotenv({
 
 // Create express app
 const app = express();
+app.use(
+  cors({
+    origin: "http://localhost:4200",
+    // credentials: true,
+  })
+);
 connectDB();
 
 app.use(express.json());
