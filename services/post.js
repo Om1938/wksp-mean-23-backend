@@ -1,15 +1,33 @@
 import Post from "../models/post.js";
 import Comment from "../models/comment.js";
 
+/**
+ * Retrieves all posts.
+ *
+ * @returns {Promise<Array>} A promise that resolves to an array of all post objects, each populated with author details.
+ */
 export const getPostsService = async () => {
   return Post.find({}).populate("author");
 };
 
+/**
+ * Creates and saves a new post.
+ *
+ * @param {Object} post - The post object containing title, content, and other relevant data.
+ * @returns {Promise<Object>} A promise that resolves to the newly created post object.
+ */
 export const addPostService = async (post) => {
   const postModel = new Post(post);
   return postModel.save();
 };
 
+/**
+ * Retrieves a post by its ID.
+ *
+ * @param {string} id - The unique identifier of the post.
+ * @returns {Promise<Object>} A promise that resolves to the post object, if found.
+ * @throws {Error} If no post with the given ID is found.
+ */
 export const getPostByIdService = async (id) => {
   const post = await Post.findById(id).populate("author");
 
@@ -20,7 +38,16 @@ export const getPostByIdService = async (id) => {
   return post;
 };
 
-export const updatePostService = async (id, author, post) => {
+/**
+ * Updates a post identified by its ID. Only the author of the post can update it.
+ *
+ * @param {string} id - The ID of the post to update.
+ * @param {string} author - The ID of the author attempting to update the post.
+ * @param {Object} postUpdate - An object containing the updated title and content of the post.
+ * @returns {Promise<Object>} A promise that resolves to the updated post object.
+ * @throws {Error} If the post is not found or if the user is not the author of the post.
+ */
+export const updatePostService = async (id, author, postUpdate) => {
   const selectedPost = await getPostByIdService(id);
   if (!selectedPost) {
     throw new Error("Post not found");
@@ -30,23 +57,49 @@ export const updatePostService = async (id, author, post) => {
     throw new Error("Forbidden: Not your post");
   }
 
-  return Post.findByIdAndUpdate(id, post);
+  selectedPost.title = postUpdate.title;
+  selectedPost.content = postUpdate.content;
+
+  const updatedPost = await selectedPost.save();
+
+  return updatedPost;
 };
 
+/**
+ * Deletes a post by its ID.
+ *
+ * @param {string} id - The ID of the post to delete.
+ * @returns {Promise<Object>} A promise that resolves to the deleted post object.
+ * @throws {Error} If no post with the given ID is found.
+ */
 export const deletePostService = async (id) => {
-  const deltetdPost = await Post.findByIdAndDelete(id);
-  if (!deltetdPost) {
+  const deletedPost = await Post.findByIdAndDelete(id);
+  if (!deletedPost) {
     throw new Error("Post not found");
   }
 
-  return deltetdPost;
+  return deletedPost;
 };
 
-export const addCommentToPostService = async (post, author, content) => {
-  const commentModel = new Comment({ author, content, post });
+/**
+ * Adds a comment to a post.
+ *
+ * @param {string} postId - The ID of the post to which the comment is being added.
+ * @param {string} authorId - The ID of the author of the comment.
+ * @param {string} content - The content of the comment.
+ * @returns {Promise<Object>} A promise that resolves to the newly created comment object.
+ */
+export const addCommentToPostService = async (postId, authorId, content) => {
+  const commentModel = new Comment({ author: authorId, content, post: postId });
   return commentModel.save();
 };
 
+/**
+ * Retrieves all comments for a specific post.
+ *
+ * @param {string} postId - The ID of the post for which comments are being retrieved.
+ * @returns {Promise<Array>} A promise that resolves to an array of comment objects associated with the post.
+ */
 export const getCommentsByPostIdService = async (postId) => {
   return Comment.find({ post: postId });
 };

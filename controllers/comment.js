@@ -50,8 +50,6 @@ export const deleteComment = async (req, res, next) => {
   const user = req.user;
   const id = req.params.id;
 
-  console.log(user);
-
   if (!user) {
     return res.status(401).json({ message: "Unauthorized" });
   }

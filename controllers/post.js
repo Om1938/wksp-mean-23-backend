@@ -33,7 +33,6 @@ export const getPostById = async (req, res, next) => {
   const { id } = req.params;
   getPostByIdService(id)
     .then((data) => {
-      console.log(data);
       res.json(data);
     })
     .catch(next);
@@ -89,7 +88,6 @@ export const getCommentsForPost = (req, res, next) => {
   const { postId } = req.params;
   getCommentsByPostIdService(postId)
     .then((data) => {
-      console.log(data);
       res.json(data);
     })
     .catch(next);
